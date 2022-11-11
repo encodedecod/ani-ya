@@ -6,6 +6,7 @@ import tip from '@/assets/tip.png';
 import edit from '@/assets/edit.png';
 import get from '@/assets/get.png';
 import rest from '@/rest';
+import { newTools, tools as mockTools } from '@/mock/home';
 
 import './index.less';
 import { RightOutline } from 'antd-mobile-icons';
@@ -15,11 +16,45 @@ export default () => {
   const history = useHistory();
   const [tools, setTools] = useState<Tool[]>([]);
   useEffect(() => {
-    rest('/managers/office/inventory/records').then((res) => {
-      if (res.data?.inventories?.length) {
-        setTools(res.data?.inventories);
-      }
-    });
+    rest('/managers/office/inventory/records')
+      .then((res) => {
+        if (res.data?.inventories?.length) {
+          setTools(res.data?.inventories);
+        } else {
+          const data = JSON.parse(localStorage.getItem('tools') || '[]') as {
+            id: string;
+            title: string;
+            date: string;
+            account: string;
+            admin: string;
+          }[];
+          setTools(
+            newTools.filter((item) => ({
+              ...item,
+              real_stock: data.find((val) => val.id === item.uid)
+                ? 99
+                : item.real_stock,
+            })),
+          );
+        }
+      })
+      .catch(() => {
+        const data = JSON.parse(localStorage.getItem('tools') || '[]') as {
+          id: string;
+          title: string;
+          date: string;
+          account: string;
+          admin: string;
+        }[];
+        setTools(
+          newTools.map((item) => ({
+            ...item,
+            real_stock: data.find((val) => val.id === item.uid)
+              ? 99
+              : item.real_stock,
+          })),
+        );
+      });
   }, []);
   const back = () => {
     history.goBack();
@@ -34,8 +69,8 @@ export default () => {
         <div className="home-top">
           <div className="home-top-user">
             <div className="home-top-user">
-              <Avatar src="" style={{ '--size': '38px' }} />
-              <text className="home-top-text">袁友</text>
+              <Avatar src={mockTools[0].avatar} style={{ '--size': '38px' }} />
+              <div className="home-top-text">袁友</div>
             </div>
             <div className="home-top-user">
               <Button

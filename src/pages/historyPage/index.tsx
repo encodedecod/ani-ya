@@ -1,22 +1,71 @@
 import { NavBar, Card } from 'antd-mobile';
 import { useHistory } from 'umi';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import cardIcon from '@/images/wishes/card-icon.png';
 import rest from '@/rest';
 
 import './index.less';
-
+import dayjs from 'dayjs';
+type History = {
+  created_at: string;
+  apply_records: {
+    id: number;
+    inventory_name: string;
+    created_at: string;
+    number: string;
+    name: string;
+  }[];
+};
 export default () => {
   const history = useHistory();
   const back = () => {
     history.goBack();
   };
-  const [historyData, sethistoryData] = useState([]);
-
+  const [historyData, setHistoryData] = useState<History[]>([]);
+  const ref = useRef<History[]>();
   useEffect(() => {
-    rest('/customers/6589/office/records').then((res) => {
-      sethistoryData(res.data.records);
-    });
+    rest('/customers/6589/office/records')
+      .then((res) => {
+        ref.current = [...(res?.data?.records || [])];
+      })
+      .finally(() => {
+        const data = JSON.parse(localStorage.getItem('tools') || '[]') as {
+          id: number;
+          title: string;
+          date: string;
+          account: string;
+          admin: string;
+        }[];
+        const obj: Record<
+          string,
+          {
+            created_at: string;
+            apply_records: {
+              id: number;
+              inventory_name: string;
+              created_at: string;
+              number: string;
+              name: string;
+            }[];
+          }
+        > = {};
+        if (data.length) {
+          obj[dayjs(data[0].date).format('YYYY-MM-DD')] = {
+            created_at: dayjs(data[0].date).format('YYYY-MM-DD'),
+            apply_records: data.map((item) => ({
+              id: item.id,
+              inventory_name: item.title,
+              created_at: item.date,
+              number: item.account,
+              name: item.admin,
+            })),
+          };
+          setHistoryData([
+            ...(ref.current || []),
+            obj[dayjs(data[0].date).format('YYYY-MM-DD')],
+          ]);
+        }
+      });
   }, []);
 
   // const historyData = [
@@ -60,6 +109,7 @@ export default () => {
   //   },
   // ];
 
+  useEffect(() => {}, []);
   return (
     <div className="history-page">
       <NavBar className="history-nav-bar" onBack={back}>

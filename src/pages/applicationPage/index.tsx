@@ -3,6 +3,7 @@ import { NavBar, Toast, Form, Input, Button } from 'antd-mobile';
 import { useState } from 'react';
 import cx from 'classnames';
 import { useHistory } from 'umi';
+import dayjs from 'dayjs';
 
 import './index.less';
 import type { Tool } from '@/types/tool';
@@ -37,7 +38,6 @@ export default () => {
   const positionTitle = positionOptions.find(
     (val) => val.value === position,
   )?.label;
-  console.log(positionTitle, tollTitle, '-==-');
 
   const powerOptions = [
     { value: '产品部门', label: '产品部门' },
@@ -51,18 +51,23 @@ export default () => {
   const onSubmitApplication = () => {
     if (!position) {
       Toast.show('请选择地区');
+      return;
     }
     if (!selectedTool) {
       Toast.show('请选择领取物品');
+      return;
     }
     if (!power) {
       Toast.show('请选择部门');
+      return;
     }
     if (!userName) {
       Toast.show('请输入姓名');
+      return;
     }
     if (!workNumber) {
       Toast.show('请输入工号');
+      return;
     }
     rest
       .post(
@@ -81,6 +86,24 @@ export default () => {
           Toast.show('领取成功！');
           back();
         }
+      })
+      .catch(() => {
+        const data = JSON.parse(localStorage.getItem('tools') || '[]');
+        localStorage.setItem(
+          'tools',
+          JSON.stringify([
+            ...data,
+            {
+              id: selectedTool,
+              title: tollTitle,
+              date: dayjs().format('YYYY-MM-DD HH-mm-ss'),
+              account: `1 份`,
+              admin: userName,
+            },
+          ]),
+        );
+        Toast.show('领取成功！');
+        back();
       });
   };
   return (

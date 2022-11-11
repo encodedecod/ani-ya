@@ -1,6 +1,5 @@
 import { NavBar, Space, Button, List, Avatar, Image } from 'antd-mobile';
 import { useHistory } from 'umi';
-import { tools } from '@/mock/home';
 import getRecord from '@/assets/getRecord.png';
 import hope from '@/assets/hope.png';
 import tip from '@/assets/tip.png';
@@ -10,13 +9,16 @@ import rest from '@/rest';
 
 import './index.less';
 import { RightOutline } from 'antd-mobile-icons';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import type { Tool } from '@/types/tool';
 export default () => {
   const history = useHistory();
-
+  const [tools, setTools] = useState<Tool[]>([]);
   useEffect(() => {
     rest('/managers/office/inventory/records').then((res) => {
-      console.log(res, '0-=0-=-=');
+      if (res.data?.inventories?.length) {
+        setTools(res.data?.inventories);
+      }
     });
   }, []);
   const back = () => {
@@ -88,24 +90,24 @@ export default () => {
           </div>
         </Space>
         <List className="home-tools-list">
-          {tools.map((tool, i) =>
-            i % 2 === 0 ? (
+          {tools.map((tool) =>
+            tool.real_stock < tool.stock ? (
               <List.Item
                 key={tool.name}
                 prefix={
                   <Image
-                    src={tool.avatar}
+                    src={tool.image}
                     style={{ borderRadius: 4 }}
                     fit="cover"
                     width={58}
                     height={58}
                   />
                 }
-                description={tool.description}
+                description={`库存: ${tool.real_stock}/${tool.stock}`}
                 extra="领取"
                 clickable
                 onClick={() => {
-                  history.push('/application-page', { ...tool });
+                  history.push('/application-page', { tools, ...tool });
                 }}
                 className="home-tools-item"
               >
@@ -116,14 +118,14 @@ export default () => {
                 key={tool.name}
                 prefix={
                   <Image
-                    src={tool.avatar}
+                    src={tool.image}
                     style={{ borderRadius: 4 }}
                     fit="cover"
                     width={58}
                     height={58}
                   />
                 }
-                description={tool.description}
+                description={`库存: ${tool.real_stock}/${tool.stock}`}
                 arrow={
                   <Image
                     src={get}

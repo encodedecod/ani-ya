@@ -1,6 +1,6 @@
-import { NavBar, Toast, Card } from 'antd-mobile';
+import { NavBar, Card } from 'antd-mobile';
 import { useHistory } from 'umi';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import cardIcon from '@/images/wishes/card-icon.png';
 import rest from '@/rest';
 
@@ -11,63 +11,64 @@ export default () => {
   const back = () => {
     history.goBack();
   };
+  const [historyData, sethistoryData] = useState([]);
 
   useEffect(() => {
-    rest('/customers/6910/office/records').then((res) => {
-      console.log(res, '0-=0-=-=');
+    rest('/customers/6589/office/records').then((res) => {
+      sethistoryData(res.data.records);
     });
   }, []);
 
-  const historyData = [
-    {
-      date: '2022-11-09',
-      data: [
-        {
-          id: 1,
-          title: '清风纸巾',
-          date: '2022-11-09 10:45:09',
-          account: '1 包',
-          admin: '李土豆',
-        },
-        {
-          id: 2,
-          title: '小日子过的不错牌黑笔',
-          date: '2022-11-09 10:45:09',
-          account: '1 支',
-          admin: '李土豆',
-        },
-      ],
-    },
-    {
-      date: '2022-10-30',
-      data: [
-        {
-          id: 1,
-          title: '清风纸巾',
-          date: '2022-11-09 10:45:09',
-          account: '1 包',
-          admin: '李土豆',
-        },
-        {
-          id: 2,
-          title: '小日子过的不错牌黑笔',
-          date: '2022-11-09 10:45:09',
-          account: '1 支',
-          admin: '李土豆',
-        },
-      ],
-    },
-  ];
+  // const historyData = [
+  //   {
+  //     created_at: '2022-11-09',
+  //     apply_records: [
+  //       {
+  //         id: 1,
+  //         inventory_name: '清纸巾',
+  //         created_at: '2022-11-09 10:45:09',
+  //         number: 1,
+  //         name: '袁友',
+  //       },
+  //       {
+  //         id: 2,
+  //         inventory_name: '电池',
+  //         created_at: '2022-11-09 10:49:09',
+  //         number: 1,
+  //         name: '袁友',
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     created_at: '2022-10-30',
+  //     apply_records: [
+  //       {
+  //         id: 1,
+  //         inventory_name: '清风纸巾',
+  //         created_at: '2022-11-09 10:45:09',
+  //         number: 1,
+  //         name: '袁友',
+  //       },
+  //       {
+  //         id: 2,
+  //         inventory_name: '电池',
+  //         created_at: '2022-11-09 10:49:09',
+  //         number: 1,
+  //         name: '袁友',
+  //       },
+  //     ],
+  //   },
+  // ];
 
   return (
     <div className="history-page">
       <NavBar className="history-nav-bar" onBack={back}>
         领取记录
       </NavBar>
-      {historyData.map((item1, index1) => (
+      {historyData.map((item1: any, index1: any) => (
         <div key={index1} className="date-item">
-          <span className="date-item-title">{item1.date}</span>
-          {item1.data.map((item2, index2) => (
+          <span className="date-item-title">{item1.created_at}</span>
+          {item1.apply_records.map((item2: any, index2: any) => (
             <Card
               className="things-card"
               key={index2}
@@ -75,16 +76,15 @@ export default () => {
                 <div className="card-header">
                   <div className="card-header-left">
                     <img src={cardIcon} alt="" />
-                    <span className="card-title">{item2.title}</span>
+                    <span className="card-title">{item2.inventory_name}</span>
                   </div>
 
-                  <span className="card-date"> {item2.date}</span>
+                  <span className="card-date"> {item2.created_at}</span>
                 </div>
               }
-              // style={{ borderRadius: '6px' }}
             >
-              <div>领取数量: {item2.account}</div>
-              <div className="admin-wrapper">发放人: {item2.admin}</div>
+              <div>领取数量: {item2.number}</div>
+              <div className="admin-wrapper">发放人: {item2.name}</div>
             </Card>
           ))}
         </div>

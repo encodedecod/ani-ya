@@ -91,6 +91,7 @@ export default () => {
                 {item.approve}
               </span>
             </div>
+            {/* TODO： comment */}
             <div className="footer-comment">
               <img src={commentIcon} alt="" />
               <span style={{ color: '#999999' }}>2</span>

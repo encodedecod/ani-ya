@@ -76,6 +76,7 @@ export default () => {
         },
       )
       .then((res) => {
+        console.log(res, '==-==');
         if (res) {
           Toast.show('领取成功！');
           back();

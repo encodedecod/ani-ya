@@ -35,7 +35,7 @@ export default () => {
           <div className="home-top-user">
             <div className="home-top-user">
               <Avatar src="" style={{ '--size': '38px' }} />
-              <text className="home-top-text">张地瓜</text>
+              <text className="home-top-text">袁友</text>
             </div>
             <div className="home-top-user">
               <Button
@@ -46,7 +46,6 @@ export default () => {
               >
                 <div style={{ display: 'flex' }}>
                   <img src={getRecord} className="home-icon" />
-
                   <div className="home-top-user-text">领取记录</div>
                 </div>
               </Button>

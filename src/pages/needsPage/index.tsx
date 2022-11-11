@@ -21,6 +21,10 @@ export default () => {
     history.goBack();
   };
 
+  const onSubmit = () => {
+    history.goBack();
+  };
+
   return (
     <div className="needs-page">
       <NavBar className="needs-nav-bar" onBack={back}>
@@ -44,7 +48,12 @@ export default () => {
           <Form.Header />
         </Form>
         <Space className="btn-wrapper">
-          <Button block size="large" className="needs-button">
+          <Button
+            block
+            size="large"
+            className="needs-button"
+            onClick={onSubmit}
+          >
             提交
           </Button>
         </Space>

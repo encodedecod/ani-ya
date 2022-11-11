@@ -93,7 +93,12 @@ export default () => {
               className="wishes-card"
               key={index}
               title={
-                <div className="card-header">
+                <div
+                  className="card-header"
+                  onClick={() => {
+                    history.push('/wishes-detail');
+                  }}
+                >
                   <img src={cardIcon} alt="" />
                   <span>{item.title}</span>
                 </div>

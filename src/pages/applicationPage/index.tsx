@@ -3,9 +3,10 @@ import { NavBar, Toast, Form, Input, Button } from 'antd-mobile';
 import { useState } from 'react';
 import cx from 'classnames';
 import { useHistory } from 'umi';
-import { tools } from '@/mock/home';
 
 import './index.less';
+import type { Tool } from '@/types/tool';
+import rest from '@/rest';
 export default () => {
   const history = useHistory();
   const [positionVisible, setPositionVisible] = useState(false);
@@ -13,14 +14,11 @@ export default () => {
   const [powerVisible, setPowerVisible] = useState(false);
   const [userName, setUserName] = useState<string>();
   const [workNumber, setWorkNumber] = useState<string>();
-  const { name } = history.location.state as {
-    id: string;
-    avatar: string;
-    name: string;
-    description: string;
-  };
+  const { uid, tools } = history.location.state as Tool & { tools: Tool[] };
   const [position, setPosition] = useState<string>();
-  const [selectedTool, setSelectedTool] = useState<string>(name);
+  console.log(uid);
+
+  const [selectedTool, setSelectedTool] = useState<string>(uid);
   const [power, setPower] = useState<string>();
   const back = () => {
     history.goBack();
@@ -31,11 +29,16 @@ export default () => {
   ];
   const toolOptions = tools.map((item) => ({
     label: item.name,
-    value: item.name,
+    value: item.uid,
   }));
+  const tollTitle = toolOptions.find(
+    (item) => item.value === selectedTool,
+  )?.label;
   const positionTitle = positionOptions.find(
     (val) => val.value === position,
   )?.label;
+  console.log(positionTitle, tollTitle, '-==-');
+
   const powerOptions = [
     { value: '产品部门', label: '产品部门' },
     { value: '研发部门', label: '研发部门' },
@@ -61,8 +64,23 @@ export default () => {
     if (!workNumber) {
       Toast.show('请输入工号');
     }
-    const data = { position, selectedTool, power, userName, workNumber };
-    console.log(data, '00-');
+    rest
+      .post(
+        `/customers/${workNumber}/office/inventory/${selectedTool}/records/`,
+        {
+          job_number: workNumber,
+          inventory_uid: selectedTool,
+          department: power,
+          name: userName,
+          number: 1,
+        },
+      )
+      .then((res) => {
+        if (res) {
+          Toast.show('领取成功！');
+          back();
+        }
+      });
   };
   return (
     <div className="application-content">
@@ -99,10 +117,10 @@ export default () => {
           onClick={() => {
             setToolVisible(true);
           }}
-          description={selectedTool || '请选择'}
+          description={tollTitle || '请选择'}
           className={cx({
-            'selected-form': selectedTool,
-            'no-selected-form': !selectedTool,
+            'selected-form': tollTitle,
+            'no-selected-form': !tollTitle,
           })}
         >
           <SelectPopup
